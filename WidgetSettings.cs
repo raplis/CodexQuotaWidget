@@ -12,6 +12,10 @@ public sealed class WidgetSettings
     public bool Topmost { get; set; } = true;
     public bool StartMinimized { get; set; }
     public bool StartWithWindows { get; set; }
+    public bool ShowStatus { get; set; } = true;
+    public bool ShowUpdated { get; set; } = true;
+    public bool ShowReset { get; set; } = true;
+    public bool ShowCreditExpiry { get; set; } = true;
     public uint HotkeyModifiers { get; set; } = 0x0002 | 0x0001;
     public uint HotkeyKey { get; set; } = 0x43;
     public string HotkeyText { get; set; } = "Ctrl + Alt + C";

@@ -95,6 +95,7 @@ public partial class MainWindow : Window
         LunaText.Foreground = RemainingBrush(luna); LunaBar.Foreground = RemainingBrush(luna);
         StatusText.Text = status ?? (q.IsLive ? (_settings.IntervalSeconds > 0 ? $"实时额度 · 每 {_settings.IntervalSeconds} 秒更新" : "实时额度 · 自动更新已关闭") : "暂无实时额度"); StatusDot.Fill = q.IsLive ? RemainingBrush(week) : (Media.Brush)FindResource("Amber");
         UpdatedText.Text = $"更新于 {q.UpdatedAt:MM-dd HH:mm:ss}"; ResetText.Text = $"5h重置 {FormatReset(q.FiveHourReset)} · 周重置 {FormatReset(q.WeekReset)}\nLuna重置 {FormatReset(q.LunaReset)}"; CreditExpiryText.Text = q.RecentCreditExpiry.HasValue ? $"最近充值卡过期 {FormatReset(q.RecentCreditExpiry)}" : q.ResetCreditCount > 0 ? "最近充值卡过期 未知" : "充值卡过期 无可用"; UpdateTrayIcon(week, q.IsLive);
+        ApplyFooterVisibility();
     }
     private string CacheAge(Quota q) { var age = DateTime.Now - q.UpdatedAt; return age.TotalSeconds < 60 ? $"{Math.Max(1, age.Seconds)} 秒前" : $"{Math.Max(1, (int)age.TotalMinutes)} 分钟前"; }
     private static string FormatReset(DateTime? value) => value == null ? "未知" : value.Value.ToLocalTime().ToString("MM-dd HH:mm");
@@ -104,10 +105,11 @@ public partial class MainWindow : Window
     private void ApplySettings()
     {
         Opacity = _settings.Opacity; Topmost = _settings.Topmost; OpacitySlider.Value = _settings.Opacity; FontSizeSlider.Value = _settings.FontSize; FontSize_Changed(this, new RoutedPropertyChangedEventArgs<double>(0, _settings.FontSize));
-        TopmostCheck.IsChecked = _settings.Topmost; StartMinimizedCheck.IsChecked = _settings.StartMinimized; StartWithWindowsCheck.IsChecked = _settings.StartWithWindows; HotkeyCapture.Content = _settings.HotkeyText;
+        TopmostCheck.IsChecked = _settings.Topmost; StartMinimizedCheck.IsChecked = _settings.StartMinimized; StartWithWindowsCheck.IsChecked = _settings.StartWithWindows; ShowStatusCheck.IsChecked = _settings.ShowStatus; ShowUpdatedCheck.IsChecked = _settings.ShowUpdated; ShowResetCheck.IsChecked = _settings.ShowReset; ShowCreditExpiryCheck.IsChecked = _settings.ShowCreditExpiry; HotkeyCapture.Content = _settings.HotkeyText;
+        ApplyFooterVisibility();
         IntervalCombo.SelectedIndex = _settings.IntervalSeconds switch { 60 => 1, 0 => 2, _ => 0 }; ThemeCombo.SelectedIndex = _settings.Theme switch { "blue" => 1, "violet" => 2, "coral" => 3, _ => 0 }; ApplyTheme(_settings.Theme);
     }
-    private void SaveSettings() { if (_loadingSettings || !IsInitialized || FontSizeSlider == null || TopmostCheck == null || StartMinimizedCheck == null || StartWithWindowsCheck == null) return; _settings.Opacity = Opacity; _settings.FontSize = FontSizeSlider.Value; _settings.Topmost = TopmostCheck.IsChecked == true; _settings.StartMinimized = StartMinimizedCheck.IsChecked == true; _settings.StartWithWindows = StartWithWindowsCheck.IsChecked == true; _settings.Left = Left; _settings.Top = Top; _settingsStore.Save(_settings); }
+    private void SaveSettings() { if (_loadingSettings || !IsInitialized || FontSizeSlider == null || TopmostCheck == null || StartMinimizedCheck == null || StartWithWindowsCheck == null || ShowStatusCheck == null || ShowUpdatedCheck == null || ShowResetCheck == null || ShowCreditExpiryCheck == null) return; _settings.Opacity = Opacity; _settings.FontSize = FontSizeSlider.Value; _settings.Topmost = TopmostCheck.IsChecked == true; _settings.StartMinimized = StartMinimizedCheck.IsChecked == true; _settings.StartWithWindows = StartWithWindowsCheck.IsChecked == true; _settings.ShowStatus = ShowStatusCheck.IsChecked == true; _settings.ShowUpdated = ShowUpdatedCheck.IsChecked == true; _settings.ShowReset = ShowResetCheck.IsChecked == true; _settings.ShowCreditExpiry = ShowCreditExpiryCheck.IsChecked == true; _settings.Left = Left; _settings.Top = Top; _settingsStore.Save(_settings); }
     private void RestoreWindowPosition()
     {
         var dpi = Media.VisualTreeHelper.GetDpi(this); var sx = dpi.DpiScaleX; var sy = dpi.DpiScaleY;
@@ -172,7 +174,7 @@ public partial class MainWindow : Window
         LunaSection.Visibility = collapsed || !_lunaAvailable ? Visibility.Collapsed : Visibility.Visible;
         QuotaTitle.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
         FiveHourBar.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-        FooterBorder.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
+        if (collapsed) FooterBorder.Visibility = Visibility.Collapsed; else ApplyFooterVisibility();
         QuotaContent.Margin = collapsed ? new Thickness(0, 8, 0, 0) : new Thickness(0, 18, 0, 12);
         SettingsPanel.Visibility = Visibility.Collapsed;
         Height = collapsed ? 125 : 370;
@@ -182,6 +184,17 @@ public partial class MainWindow : Window
         SaveSettings();
     }
     private void Settings_Click(object sender, RoutedEventArgs e) => SettingsPanel.Visibility = SettingsPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+    private void FooterDisplay_Changed(object sender, RoutedEventArgs e) { if (_loadingSettings) return; SaveSettings(); ApplyFooterVisibility(); }
+    private void ApplyFooterVisibility()
+    {
+        StatusText.Visibility = _settings.ShowStatus ? Visibility.Visible : Visibility.Collapsed;
+        StatusDot.Visibility = _settings.ShowStatus ? Visibility.Visible : Visibility.Collapsed;
+        UpdatedText.Visibility = _settings.ShowUpdated ? Visibility.Visible : Visibility.Collapsed;
+        ResetText.Visibility = _settings.ShowReset ? Visibility.Visible : Visibility.Collapsed;
+        CreditExpiryText.Visibility = _settings.ShowCreditExpiry ? Visibility.Visible : Visibility.Collapsed;
+        var anyVisible = _settings.ShowStatus || _settings.ShowUpdated || _settings.ShowReset || _settings.ShowCreditExpiry;
+        FooterBorder.Visibility = WeekSection.Visibility == Visibility.Visible && anyVisible ? Visibility.Visible : Visibility.Collapsed;
+    }
     private void Opacity_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) { if (IsLoaded) { Opacity = e.NewValue; SaveSettings(); } }
     private void FontSize_Changed(object sender, RoutedPropertyChangedEventArgs<double> e) { if (FiveHourText != null) { FiveHourText.FontSize = e.NewValue; WeekText.FontSize = e.NewValue; LunaText.FontSize = e.NewValue; if (IsLoaded) SaveSettings(); } }
     private void TopmostCheck_Click(object sender, RoutedEventArgs e) { Topmost = TopmostCheck.IsChecked == true; SaveSettings(); }

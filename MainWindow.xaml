@@ -35,6 +35,11 @@
             <CheckBox x:Name="TopmostCheck" Content="始终最前" IsChecked="True" Checked="TopmostCheck_Click" Unchecked="TopmostCheck_Click" Foreground="{StaticResource Ink}" Margin="0,12,0,0"/>
             <CheckBox x:Name="StartMinimizedCheck" Content="启动时最小化到托盘" Foreground="{StaticResource Ink}" Margin="0,8,0,0" Checked="StartMinimized_Click" Unchecked="StartMinimized_Click"/>
             <CheckBox x:Name="StartWithWindowsCheck" Content="开机自动启动" Foreground="{StaticResource Ink}" Margin="0,8,0,0" Checked="StartWithWindows_Click" Unchecked="StartWithWindows_Click"/>
+            <TextBlock Text="底部信息" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,15,0,4"/>
+            <CheckBox x:Name="ShowStatusCheck" Content="显示更新状态" Foreground="{StaticResource Ink}" Checked="FooterDisplay_Changed" Unchecked="FooterDisplay_Changed"/>
+            <CheckBox x:Name="ShowUpdatedCheck" Content="显示更新时间" Foreground="{StaticResource Ink}" Margin="0,6,0,0" Checked="FooterDisplay_Changed" Unchecked="FooterDisplay_Changed"/>
+            <CheckBox x:Name="ShowResetCheck" Content="显示窗口重置时间" Foreground="{StaticResource Ink}" Margin="0,6,0,0" Checked="FooterDisplay_Changed" Unchecked="FooterDisplay_Changed"/>
+            <CheckBox x:Name="ShowCreditExpiryCheck" Content="显示充值卡过期时间" Foreground="{StaticResource Ink}" Margin="0,6,0,0" Checked="FooterDisplay_Changed" Unchecked="FooterDisplay_Changed"/>
             <TextBlock Text="快捷键" Foreground="{StaticResource Muted}" FontSize="11" Margin="0,15,0,4"/>
             <Button x:Name="HotkeyCapture" Content="Ctrl + Alt + C" Click="HotkeyCapture_Click" KeyDown="HotkeyCapture_KeyDown" Style="{StaticResource CaptureButton}"/>
             <TextBlock Text="点击上方按钮后，直接按下你想要的组合键" Foreground="#777C74" FontSize="10" Margin="0,5,0,14"/>
