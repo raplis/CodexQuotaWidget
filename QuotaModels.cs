@@ -9,6 +9,8 @@ public sealed class Quota
     public DateTime? FiveHourReset { get; set; }
     public DateTime? WeekReset { get; set; }
     public DateTime? LunaReset { get; set; }
+    public DateTime? RecentCreditExpiry { get; set; }
+    public int ResetCreditCount { get; set; }
     public bool HasLunaReserve { get; set; }
     public bool IsLive { get; set; }
 }

@@ -23,7 +23,7 @@
           <ProgressBar x:Name="LunaBar" Margin="0,8,0,0" Maximum="100" Style="{StaticResource GreenProgress}"/>
         </StackPanel>
       </StackPanel>
-      <Border x:Name="FooterBorder" Grid.Row="2" Background="{StaticResource PanelSoft}" CornerRadius="10" Padding="10,8"><Grid><StackPanel><TextBlock x:Name="StatusText" Foreground="{StaticResource Muted}" FontSize="10"/><TextBlock x:Name="UpdatedText" Foreground="#777C74" FontSize="10" Margin="0,3,0,0"/><TextBlock x:Name="ResetText" Foreground="#777C74" FontSize="10" Margin="0,2,0,0"/></StackPanel><Ellipse x:Name="StatusDot" Grid.Column="1" Width="7" Height="7" Fill="{StaticResource Amber}" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid></Border>
+      <Border x:Name="FooterBorder" Grid.Row="2" Background="{StaticResource PanelSoft}" CornerRadius="10" Padding="10,8"><Grid><StackPanel><TextBlock x:Name="StatusText" Foreground="{StaticResource Muted}" FontSize="10"/><TextBlock x:Name="UpdatedText" Foreground="#777C74" FontSize="10" Margin="0,3,0,0"/><TextBlock x:Name="ResetText" Foreground="#777C74" FontSize="10" Margin="0,2,0,0"/><TextBlock x:Name="CreditExpiryText" Foreground="#777C74" FontSize="10" Margin="0,2,0,0"/></StackPanel><Ellipse x:Name="StatusDot" Grid.Column="1" Width="7" Height="7" Fill="{StaticResource Amber}" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid></Border>
       <Border x:Name="SettingsPanel" Grid.Row="1" Grid.RowSpan="2" Background="#F21A1D1C" CornerRadius="14" Padding="16" Visibility="Collapsed">
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <ScrollViewer.Resources><Style TargetType="ScrollBar" BasedOn="{StaticResource SlimScrollBar}"/></ScrollViewer.Resources>

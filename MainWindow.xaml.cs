@@ -94,7 +94,7 @@ public partial class MainWindow : Window
         LunaBar.Value = q.LunaUsed; LunaText.Text = $"剩余 {luna:0}%";
         LunaText.Foreground = RemainingBrush(luna); LunaBar.Foreground = RemainingBrush(luna);
         StatusText.Text = status ?? (q.IsLive ? (_settings.IntervalSeconds > 0 ? $"实时额度 · 每 {_settings.IntervalSeconds} 秒更新" : "实时额度 · 自动更新已关闭") : "暂无实时额度"); StatusDot.Fill = q.IsLive ? RemainingBrush(week) : (Media.Brush)FindResource("Amber");
-        UpdatedText.Text = $"更新于 {q.UpdatedAt:MM-dd HH:mm:ss}"; ResetText.Text = $"5h重置 {FormatReset(q.FiveHourReset)} · 周重置 {FormatReset(q.WeekReset)}\nLuna重置 {FormatReset(q.LunaReset)}"; UpdateTrayIcon(week, q.IsLive);
+        UpdatedText.Text = $"更新于 {q.UpdatedAt:MM-dd HH:mm:ss}"; ResetText.Text = $"5h重置 {FormatReset(q.FiveHourReset)} · 周重置 {FormatReset(q.WeekReset)}\nLuna重置 {FormatReset(q.LunaReset)}"; CreditExpiryText.Text = q.RecentCreditExpiry.HasValue ? $"最近充值卡过期 {FormatReset(q.RecentCreditExpiry)}" : q.ResetCreditCount > 0 ? "最近充值卡过期 未知" : "充值卡过期 无可用"; UpdateTrayIcon(week, q.IsLive);
     }
     private string CacheAge(Quota q) { var age = DateTime.Now - q.UpdatedAt; return age.TotalSeconds < 60 ? $"{Math.Max(1, age.Seconds)} 秒前" : $"{Math.Max(1, (int)age.TotalMinutes)} 分钟前"; }
     private static string FormatReset(DateTime? value) => value == null ? "未知" : value.Value.ToLocalTime().ToString("MM-dd HH:mm");

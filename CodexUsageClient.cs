@@ -20,7 +20,49 @@ public sealed class CodexUsageClient
         if (!string.IsNullOrWhiteSpace(auth.AccountId)) request.Headers.TryAddWithoutValidation("ChatGPT-Account-Id", auth.AccountId);
         using var response = await _http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
-        return Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+        var usageJson = await response.Content.ReadAsStringAsync(cancellationToken);
+        var quota = Parse(usageJson);
+        if (quota.ResetCreditCount > 0)
+        {
+            quota.RecentCreditExpiry = await FetchRecentCreditExpiryAsync(auth, cancellationToken);
+        }
+        return quota;
+    }
+
+    private async Task<DateTime?> FetchRecentCreditExpiryAsync(AuthInfo auth, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", auth.AccessToken);
+            request.Headers.Accept.ParseAdd("application/json");
+            request.Headers.TryAddWithoutValidation("oai-product-sku", "CODEX");
+            request.Headers.TryAddWithoutValidation("originator", "Codex Desktop");
+            request.Headers.UserAgent.ParseAdd("codex_quota_widget/1.0");
+            if (!string.IsNullOrWhiteSpace(auth.AccountId)) request.Headers.TryAddWithoutValidation("ChatGPT-Account-Id", auth.AccountId);
+            using var response = await _http.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode) return null;
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
+            if (!doc.RootElement.TryGetProperty("credits", out var credits) || credits.ValueKind != JsonValueKind.Array) return null;
+
+            var now = DateTimeOffset.UtcNow;
+            var upcoming = credits.EnumerateArray()
+                .Where(IsAvailableCredit)
+                .Select(c => ParseTimestamp(Property(c, "expires_at")))
+                .Where(value => value.HasValue && value.Value > now)
+                .OrderBy(value => value)
+                .FirstOrDefault();
+            return upcoming?.LocalDateTime;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            // Credit details are supplementary; quota rendering should still work if this endpoint changes.
+            return null;
+        }
     }
 
     private AuthInfo ReadAuth()
@@ -45,6 +87,7 @@ public sealed class CodexUsageClient
             : default;
         var lunaRate = Property(lunaLimit, "rate_limit");
         var lunaWindow = Property(lunaRate, "primary_window");
+        var resetCredits = Property(root, "rate_limit_reset_credits");
         return new Quota
         {
             FiveHourUsed = Number(shortWindow, "used_percent"),
@@ -53,10 +96,22 @@ public sealed class CodexUsageClient
             FiveHourReset = Unix(shortWindow, "reset_at"),
             WeekReset = Unix(weekly, "reset_at"),
             LunaReset = Unix(lunaWindow, "reset_at"),
+            ResetCreditCount = Math.Max(0, (int)Number(resetCredits, "available_count")),
             HasLunaReserve = lunaLimit.ValueKind != JsonValueKind.Undefined && lunaLimit.ValueKind != JsonValueKind.Null,
             UpdatedAt = DateTime.Now,
             IsLive = true
         };
+    }
+    private static bool IsAvailableCredit(JsonElement credit)
+    {
+        var status = GetString(credit, "status");
+        return string.IsNullOrWhiteSpace(status) || status.Equals("available", StringComparison.OrdinalIgnoreCase);
+    }
+    private static DateTimeOffset? ParseTimestamp(JsonElement value)
+    {
+        if (value.ValueKind == JsonValueKind.String && DateTimeOffset.TryParse(value.GetString(), null, System.Globalization.DateTimeStyles.AssumeUniversal, out var parsed)) return parsed.ToUniversalTime();
+        if (value.ValueKind == JsonValueKind.Number && value.TryGetInt64(out var unix)) return unix > 10_000_000_000 ? DateTimeOffset.FromUnixTimeMilliseconds(unix) : DateTimeOffset.FromUnixTimeSeconds(unix);
+        return null;
     }
     private static bool IsLunaReserve(JsonElement e) =>
         (e.TryGetProperty("normal_model_slug", out var model) && model.GetString()?.Contains("luna", StringComparison.OrdinalIgnoreCase) == true)
