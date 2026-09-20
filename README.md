@@ -94,6 +94,6 @@ CodexQuotaWidget/
 └─ tools/                   # 图标生成脚本
 ```
 
-## 许可
+## 许可证
 
-当前项目未指定开源许可证。若要公开分发，请根据你的使用场景补充合适的 License 文件。
+本项目采用 [MIT License](LICENSE) 开源许可证。
