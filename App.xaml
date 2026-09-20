@@ -1,0 +1,12 @@
+<Application x:Class="CodexQuotaWidget.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" StartupUri="MainWindow.xaml">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Themes.xaml"/></ResourceDictionary.MergedDictionaries>
+      <SolidColorBrush x:Key="Ink" Color="#F7F7F2"/><SolidColorBrush x:Key="Muted" Color="#A7A89F"/>
+      <SolidColorBrush x:Key="Panel" Color="#1A1D1C"/><SolidColorBrush x:Key="PanelSoft" Color="#232725"/>
+      <SolidColorBrush x:Key="Line" Color="#343A36"/><SolidColorBrush x:Key="Green" Color="#B7E46C"/>
+      <SolidColorBrush x:Key="Amber" Color="#F0B765"/>
+      <SolidColorBrush x:Key="Red" Color="#F06A6A"/>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

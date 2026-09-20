@@ -1,0 +1,20 @@
+# Build output and compiler intermediates
+bin/
+obj/
+publish/
+CodexQuotaWidget-portable/
+portable-build/
+
+# Packaged releases; upload these through GitHub Releases instead
+*.zip
+*.pdb
+
+# Visual Studio / local user files
+.vs/
+*.user
+*.suo
+
+# Local runtime data should never be placed in the repository
+last-quota.json
+startup.log
+auth.json
