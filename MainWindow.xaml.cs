@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private bool _exiting;
     private bool _loadingSettings;
     private bool _lunaAvailable;
+    private bool _isCollapsed;
     private const int ShowWidgetMessage = 0x8001;
 
     public MainWindow()
@@ -169,19 +170,31 @@ public partial class MainWindow : Window
     private void Refresh_Click(object sender, RoutedEventArgs e) => _ = RefreshAsync();
     private void Collapse_Click(object sender, RoutedEventArgs e)
     {
-        var collapsed = WeekSection.Visibility == Visibility.Visible;
-        WeekSection.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-        LunaSection.Visibility = collapsed || !_lunaAvailable ? Visibility.Collapsed : Visibility.Visible;
-        QuotaTitle.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-        FiveHourBar.Visibility = collapsed ? Visibility.Collapsed : Visibility.Visible;
-        if (collapsed) FooterBorder.Visibility = Visibility.Collapsed; else ApplyFooterVisibility();
-        QuotaContent.Margin = collapsed ? new Thickness(0, 8, 0, 0) : new Thickness(0, 18, 0, 12);
+        _isCollapsed = !_isCollapsed;
+        MainHeader.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        WeekSection.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        LunaSection.Visibility = !_isCollapsed && _lunaAvailable ? Visibility.Visible : Visibility.Collapsed;
+        QuotaTitle.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        FiveHourBar.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
+        FiveHourRow.Margin = _isCollapsed ? new Thickness(0) : new Thickness(0, 8, 0, 0);
+        if (_isCollapsed) FooterBorder.Visibility = Visibility.Collapsed; else ApplyFooterVisibility();
+        QuotaContent.Margin = _isCollapsed ? new Thickness(0) : new Thickness(0, 18, 0, 12);
+        WidgetBorder.Padding = _isCollapsed ? new Thickness(12, 6, 12, 6) : new Thickness(18);
+        WidgetBorder.CornerRadius = _isCollapsed ? new CornerRadius(15) : new CornerRadius(18);
         SettingsPanel.Visibility = Visibility.Collapsed;
-        Height = collapsed ? 125 : 370;
-        CollapseGlyph.Text = collapsed ? "⌄" : "⌃";
-        CollapseButton.ToolTip = collapsed ? "展开" : "折叠";
+        Height = _isCollapsed ? 48 : 370;
+        CollapseGlyph.Text = "⌄";
+        CollapseButton.ToolTip = "折叠";
+        FiveHourSection.Cursor = _isCollapsed ? System.Windows.Input.Cursors.Hand : System.Windows.Input.Cursors.Arrow;
+        FiveHourSection.ToolTip = _isCollapsed ? "点击展开" : null;
         EnsureWindowOnScreen();
         SaveSettings();
+    }
+    private void CompactBar_Click(object sender, MouseButtonEventArgs e)
+    {
+        if (!_isCollapsed) return;
+        e.Handled = true;
+        Collapse_Click(sender, e);
     }
     private void Settings_Click(object sender, RoutedEventArgs e) => SettingsPanel.Visibility = SettingsPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
     private void FooterDisplay_Changed(object sender, RoutedEventArgs e) { if (_loadingSettings) return; SaveSettings(); ApplyFooterVisibility(); }
