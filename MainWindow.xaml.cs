@@ -177,6 +177,9 @@ public partial class MainWindow : Window
         QuotaTitle.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
         FiveHourBar.Visibility = _isCollapsed ? Visibility.Collapsed : Visibility.Visible;
         FiveHourRow.Margin = _isCollapsed ? new Thickness(0) : new Thickness(0, 8, 0, 0);
+        FiveHourRow.ColumnDefinitions[0].Width = _isCollapsed ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+        FiveHourRow.HorizontalAlignment = _isCollapsed ? System.Windows.HorizontalAlignment.Center : System.Windows.HorizontalAlignment.Stretch;
+        FiveHourText.Margin = _isCollapsed ? new Thickness(18, 0, 0, 0) : new Thickness(0);
         if (_isCollapsed) FooterBorder.Visibility = Visibility.Collapsed; else ApplyFooterVisibility();
         QuotaContent.Margin = _isCollapsed ? new Thickness(0) : new Thickness(0, 18, 0, 12);
         WidgetBorder.Padding = _isCollapsed ? new Thickness(12, 6, 12, 6) : new Thickness(18);

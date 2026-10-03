@@ -10,7 +10,7 @@
       <StackPanel x:Name="QuotaContent" Grid.Row="1" Margin="0,18,0,12">
         <TextBlock x:Name="QuotaTitle" Text="使用额度" Foreground="{StaticResource Muted}" FontSize="12"/>
         <StackPanel x:Name="FiveHourSection" Visibility="Visible" MouseLeftButtonDown="CompactBar_Click">
-          <Grid x:Name="FiveHourRow" Margin="0,8,0,0" VerticalAlignment="Center"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="5 小时窗口" Foreground="{StaticResource Ink}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/><TextBlock x:Name="FiveHourText" Grid.Column="1" Foreground="{StaticResource Green}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center"/></Grid>
+          <Grid x:Name="FiveHourRow" Margin="0,8,0,0" VerticalAlignment="Center"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="FiveHourLabel" Text="5 小时窗口" Foreground="{StaticResource Ink}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/><TextBlock x:Name="FiveHourText" Grid.Column="1" Foreground="{StaticResource Green}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center"/></Grid>
           <ProgressBar x:Name="FiveHourBar" Margin="0,8,0,16" Maximum="100" Style="{StaticResource GreenProgress}"/>
         </StackPanel>
         <StackPanel x:Name="WeekSection">
